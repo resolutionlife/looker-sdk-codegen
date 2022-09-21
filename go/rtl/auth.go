@@ -26,18 +26,18 @@ func init() {
 
 // This struct implements the Roundtripper interface (golang's http middleware)
 // It sets the "x-looker-appid" Header on requests
-type transportWithHeaders struct{
+type transportWithHeaders struct {
 	Base http.RoundTripper
 }
 
 func (t *transportWithHeaders) RoundTrip(req *http.Request) (*http.Response, error) {
-    req.Header.Set("x-looker-appid", "go-sdk")
-    return t.Base.RoundTrip(req)
+	req.Header.Set("x-looker-appid", "go-sdk")
+	return t.Base.RoundTrip(req)
 }
 
 type AuthSession struct {
-	Config    ApiSettings
-	Client    http.Client
+	Config ApiSettings
+	Client http.Client
 }
 
 func NewAuthSession(config ApiSettings) *AuthSession {
@@ -62,8 +62,8 @@ func NewAuthSessionWithTransport(config ApiSettings, transport http.RoundTripper
 	oauthConfig := clientcredentials.Config{
 		ClientID:     config.ClientId,
 		ClientSecret: config.ClientSecret,
-		TokenURL: fmt.Sprintf("%s/api/%s/login", config.BaseUrl, config.ApiVersion),
-		AuthStyle: oauth2.AuthStyleInParams,
+		TokenURL:     fmt.Sprintf("%s/api/%s/login", config.BaseUrl, config.ApiVersion),
+		AuthStyle:    oauth2.AuthStyleInParams,
 	}
 
 	ctx := context.WithValue(
@@ -78,15 +78,15 @@ func NewAuthSessionWithTransport(config ApiSettings, transport http.RoundTripper
 		Source: oauthConfig.TokenSource(ctx),
 		// Will set "x-looker-appid" Header on all other requests
 		Base: appIdHeaderTransport,
-    }
+	}
 
 	return &AuthSession{
-		Config:    config,
-		Client:    http.Client{ Transport: oauthTransport },
+		Config: config,
+		Client: http.Client{Transport: oauthTransport},
 	}
 }
 
-func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars map[string]interface{}, body interface{}, options *ApiSettings) error {
+func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars map[string]interface{}, body interface{}, headerOptions *HeaderOptions, options *ApiSettings) error {
 
 	// prepare URL
 	u := fmt.Sprintf("%s/api%s%s", s.Config.BaseUrl, ver, path)
@@ -102,6 +102,14 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// set query params
 	setQuery(req.URL, reqPars)
 
+	if headerOptions == nil {
+		headerOptions = NewHeaderOptions(nil)
+	}
+
+	for key, val := range headerOptions.Headers {
+		req.Header.Add(key, val)
+	}
+
 	// do the actual http call
 	res, err := s.Client.Do(req)
 	if err != nil {
@@ -112,7 +120,7 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	if res.StatusCode < 200 || res.StatusCode > 226 {
 		b, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-				return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
+			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
 		}
 
 		return fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b))
@@ -122,11 +130,11 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// Github Issue: https://github.com/looker-open-source/sdk-codegen/issues/1022
 	switch v := result.(type) {
 	case *string:
-			b, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-					return err
-			}
-			*v = string(b)
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		*v = string(b)
 	default:
 		return json.NewDecoder(res.Body).Decode(&result)
 	}

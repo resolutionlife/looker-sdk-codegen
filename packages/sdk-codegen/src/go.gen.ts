@@ -192,12 +192,16 @@ export class GoGen extends CodeGen {
       `func (l *LookerSDK) ${this.toCamelCaseCap(method.name)}(` +
       (streamer ? `\n${bump}${callback}` : '')
 
+    let h = ''
+    if (mapped.name !== 'Void') {
+      h = (method.returnType?.mediaType ? '' : `, headerOptions *rtl.HeaderOptions`)
+    }
+
     return (
       header +
       fragment +
-      `${
-        fragment ? ',' : ''
-      }\n${bump}options *rtl.ApiSettings) (${retType}error) {\n`
+      `${fragment ? ',' : ''
+      }\n${bump}options *rtl.ApiSettings${h}) (${retType}error) {\n`
     )
   }
 
@@ -227,8 +231,7 @@ export class GoGen extends CodeGen {
     return (
       // so it turns out Go doesn't like parameter comments. Go figure https://stackoverflow.com/a/67878816
       // this.commentHeader(indent, this.paramComment(param, mapped)) +
-      `${indent}${this.toCamelCase(this.reserve(param.name))} ${pOpt}${
-        mapped.name
+      `${indent}${this.toCamelCase(this.reserve(param.name))} ${pOpt}${mapped.name
       }`
     )
   }
@@ -281,10 +284,20 @@ export class GoGen extends CodeGen {
   //   {queryArgs...}
   httpArgs(indent: string, method: IMethod) {
     const request = this.useRequest(method) ? 'request' : ''
+    const mapped = this.typeMap(method.type)
     // add options at the end of the request calls. this will cause all other arguments to be
     // filled in but there's no way to avoid this for passing in the last optional parameter.
     // Fortunately, this code bloat is minimal and also hidden from the consumer.
-    let result = this.argFill('', 'options')
+    // let result = this.argFill('', 'options')
+    // if (mapped.name !== 'Void') {
+    //   result = this.argFill(result, method.returnType?.mediaType ? this.nullStr : 'headerOptions')
+    // } else {
+    //   result = this.argFill(result, this.nullStr)
+    // }
+    let result = this.argFill('options', this.nullStr)
+    if (mapped.name !== 'Void') {
+      result = this.argFill('options', method.returnType?.mediaType ? this.nullStr : 'headerOptions')
+    }
     // let result = this.argFill('', this.argGroup(indent, method.cookieArgs, request))
     // result = this.argFill(result, this.argGroup(indent, method.headerArgs, request))
     result = this.argFill(
