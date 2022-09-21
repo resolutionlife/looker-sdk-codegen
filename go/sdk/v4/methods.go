@@ -35,9 +35,10 @@ package v4
 
 import (
 	"fmt"
-	"github.com/looker-open-source/sdk-codegen/go/rtl"
 	"net/url"
 	"time"
+
+	"github.com/resolutionlife/looker-sdk-codegen/go/rtl"
 )
 
 type LookerSDK struct {

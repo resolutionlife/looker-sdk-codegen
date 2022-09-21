@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/looker-open-source/sdk-codegen/go/rtl"
-	"github.com/looker-open-source/sdk-codegen/go/sdk/v4"
+	"github.com/resolutionlife/looker-sdk-codegen/go/rtl"
+	v4 "github.com/resolutionlife/looker-sdk-codegen/go/sdk/v4"
 )
 
 func main() {

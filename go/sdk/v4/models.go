@@ -34,8 +34,9 @@ SOFTWARE.
 package v4
 
 import (
-	"github.com/looker-open-source/sdk-codegen/go/rtl"
 	"time"
+
+	"github.com/resolutionlife/looker-sdk-codegen/go/rtl"
 )
 
 type AccessToken struct {

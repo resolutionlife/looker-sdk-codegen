@@ -10,8 +10,8 @@ import (
 
 	json "github.com/json-iterator/go"
 	extra "github.com/json-iterator/go/extra"
-	"github.com/looker-open-source/sdk-codegen/go/rtl"
-	v4 "github.com/looker-open-source/sdk-codegen/go/sdk/v4"
+	"github.com/resolutionlife/looker-sdk-codegen/go/rtl"
+	v4 "github.com/resolutionlife/looker-sdk-codegen/go/sdk/v4"
 )
 
 type testDataStruct struct {
