@@ -288,12 +288,7 @@ export class GoGen extends CodeGen {
     // add options at the end of the request calls. this will cause all other arguments to be
     // filled in but there's no way to avoid this for passing in the last optional parameter.
     // Fortunately, this code bloat is minimal and also hidden from the consumer.
-    // let result = this.argFill('', 'options')
-    // if (mapped.name !== 'Void') {
-    //   result = this.argFill(result, method.returnType?.mediaType ? this.nullStr : 'headerOptions')
-    // } else {
-    //   result = this.argFill(result, this.nullStr)
-    // }
+    // TODO: Clean up
     let result = this.argFill('options', this.nullStr)
     if (mapped.name !== 'Void') {
       result = this.argFill('options', method.returnType?.mediaType ? this.nullStr : 'headerOptions')

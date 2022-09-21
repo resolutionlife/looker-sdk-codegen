@@ -8800,6 +8800,13 @@
             "description": "Combine given search criteria in a boolean OR expression",
             "required": false,
             "type": "boolean"
+          },
+          {
+            "name": "permission",
+            "in": "query",
+            "description": "Filter results based on permission, either show (default) or update",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {
@@ -28531,6 +28538,12 @@
           "type": "string",
           "description": "(Read/Write) SQL Dialect name",
           "x-looker-nullable": true
+        },
+        "supports_data_studio_link": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Database connection has the ability to support open data studio from explore",
+          "x-looker-nullable": false
         },
         "created_at": {
           "type": "string",

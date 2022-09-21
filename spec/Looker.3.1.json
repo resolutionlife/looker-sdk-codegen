@@ -24391,6 +24391,12 @@
           "description": "(Read/Write) SQL Dialect name",
           "x-looker-nullable": true
         },
+        "supports_data_studio_link": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Database connection has the ability to support open data studio from explore",
+          "x-looker-nullable": false
+        },
         "created_at": {
           "type": "string",
           "readOnly": true,
