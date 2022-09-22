@@ -96,7 +96,7 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// create new request
 	req, err := http.NewRequest(method, u, bytes.NewBufferString(bodyString))
 	if err != nil {
-		return err
+		return fmt.Errorf("%v, error creating new request", err)
 	}
 
 	// set query params
@@ -105,17 +105,23 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// do the actual http call
 	res, err := s.Client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("%v, error executing new request", err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 226 {
 		b, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
+			return fmt.Errorf("response error. status=%d. error parsing error body", res.StatusCode)
 		}
+		return ResponseError{
+			StatusCode: res.StatusCode,
+			Body:       b,
+		}
+	}
 
-		return fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b))
+	if result == nil {
+		return nil
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.

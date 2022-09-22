@@ -266,7 +266,7 @@ export class GoGen extends CodeGen {
       )}", "${this.apiPath}", ${this.httpPath(method.endpoint, request)}` +
       `${args ? ', ' + args : ''})` +
       '\n' +
-      `${indent}return ${result}err` +
+      `${indent}return ${result}parseErr(err)` +
       '\n'
     )
   }
