@@ -102,6 +102,9 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// set query params
 	setQuery(req.URL, reqPars)
 
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+
 	// do the actual http call
 	res, err := s.Client.Do(req)
 	if err != nil {
@@ -115,7 +118,24 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
 		}
 
-		return fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b))
+		var e error
+		switch res.StatusCode {
+		case http.StatusUnprocessableEntity:
+			// Status 422 returns a json payload of type ValidationError
+			e = new(ValidationError)
+		default:
+			// All other status codes return a json payload of type Error
+			e = new(Error)
+		}
+		if err := json.Unmarshal(b, &e); err != nil {
+			return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", res.StatusCode, res.Body, err.Error())
+		}
+
+		return ResponseError{
+			StatusCode: res.StatusCode,
+			Body:       b,
+			Err:        e,
+		}
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.
