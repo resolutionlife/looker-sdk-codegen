@@ -102,6 +102,10 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// set query params
 	setQuery(req.URL, reqPars)
 
+	// set headers
+	req.Header.Add("Accept", `application/json`)
+	req.Header.Add("Content-Type", `application/json`)
+
 	// do the actual http call
 	res, err := s.Client.Do(req)
 	if err != nil {
