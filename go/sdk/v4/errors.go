@@ -19,23 +19,19 @@ func parseErr(err error) error {
 		return fmt.Errorf("response error. status=%d. error parsing body", re.StatusCode)
 	}
 
+	var e error
 	switch re.StatusCode {
 	case http.StatusUnprocessableEntity:
 		// Status 422 returns a json payload of type ValidationError
-		var e ValidationError
-		if err := json.Unmarshal(re.Body, &e); err != nil {
-			// don't love this
-			return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
-		}
-		re.Err = e
+		e = new(ValidationError)
 	default:
 		// All other status codes return a json payload of type Error
-		var e Error
-		if err := json.Unmarshal(re.Body, &e); err != nil {
-			return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
-		}
-		re.Err = e
+		e = new(Error)
 	}
+	if err := json.Unmarshal(re.Body, &e); err != nil {
+		return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
+	}
+	re.Err = e
 
 	return re
 }
