@@ -114,29 +114,30 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 226 {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
+		re := ResponseError{
+			StatusCode: res.StatusCode,
 		}
 
-		var e error
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			re.Err = fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
+			return re
+		}
+		re.Body = b
+
 		switch res.StatusCode {
 		case http.StatusUnprocessableEntity:
 			// Status 422 returns a json payload of type ValidationError
-			e = new(ValidationError)
+			re.Err = new(ValidationError)
 		default:
 			// All other status codes return a json payload of type Error
-			e = new(Error)
+			re.Err = new(Error)
 		}
-		if err := json.Unmarshal(b, &e); err != nil {
-			return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", res.StatusCode, res.Body, err.Error())
+		if uErr := json.Unmarshal(b, &re.Err); err != nil {
+			return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", res.StatusCode, res.Body, uErr.Error())
 		}
 
-		return ResponseError{
-			StatusCode: res.StatusCode,
-			Body:       b,
-			Err:        e,
-		}
+		return re
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.
