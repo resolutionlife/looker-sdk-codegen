@@ -114,15 +114,18 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 226 {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
+		re := ResponseError{
+			StatusCode: res.StatusCode,
 		}
 
-		return ResponseError{
-			StatusCode: res.StatusCode,
-			Err:        fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b)),
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			re.Err = fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
+			return re
 		}
+		re.Err = fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b))
+
+		return re
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.
