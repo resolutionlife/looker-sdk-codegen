@@ -96,7 +96,7 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// create new request
 	req, err := http.NewRequest(method, u, bytes.NewBufferString(bodyString))
 	if err != nil {
-		return fmt.Errorf("%v, error creating new request", err)
+		return err
 	}
 
 	// set query params
@@ -109,7 +109,7 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	// do the actual http call
 	res, err := s.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("%v, error executing new request", err)
+		return err
 	}
 	defer res.Body.Close()
 
@@ -126,10 +126,6 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 		re.Body = b
 
 		return re
-	}
-
-	if result == nil {
-		return nil
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.
