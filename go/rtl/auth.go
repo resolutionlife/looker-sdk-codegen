@@ -119,7 +119,10 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
 		}
 
-		return fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b))
+		return ResponseError{
+			StatusCode: res.StatusCode,
+			Err:        fmt.Errorf("response error. status=%s. error=%s", res.Status, string(b)),
+		}
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.
