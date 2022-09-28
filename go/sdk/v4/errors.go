@@ -28,7 +28,9 @@ func (e ValidationError) Error() string {
 
 	var errSlice []string
 	for _, m := range *e.Errors {
-		errSlice = append(errSlice, fmt.Sprintf("'%s' (%s)", *m.Field, *m.Message))
+		if m.Field != nil && m.Message != nil {
+			errSlice = append(errSlice, fmt.Sprintf("'%s' (%s)", *m.Field, *m.Message))
+		}
 	}
 	return fmt.Sprintf("validation error on fields: %s", strings.Join(errSlice, ", "))
 }

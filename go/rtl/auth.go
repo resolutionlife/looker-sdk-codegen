@@ -117,7 +117,7 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	if res.StatusCode < 200 || res.StatusCode > 226 {
 		b, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			return fmt.Errorf("response error. status=%d. error parsing error body", res.StatusCode)
+			return fmt.Errorf("response error. status=%s. error parsing error body", res.Status)
 		}
 
 		return ResponseError{
