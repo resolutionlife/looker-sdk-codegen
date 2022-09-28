@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -114,18 +115,15 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 226 {
-		re := ResponseError{
-			StatusCode: res.StatusCode,
-		}
-
 		b, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			re.Err = fmt.Errorf("response error. status=%d. error parsing error body", res.StatusCode)
-			return re
+			return fmt.Errorf("response error. status=%d. error parsing error body", res.StatusCode)
 		}
-		re.Body = b
 
-		return re
+		return ResponseError{
+			StatusCode: res.StatusCode,
+			Body:       b,
+		}
 	}
 
 	// TODO: Make parsing content-type aware. Requires change to go model generation to use interface{} for all union types.

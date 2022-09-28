@@ -7,39 +7,20 @@ import (
 	"strings"
 
 	"github.com/looker-open-source/sdk-codegen/go/rtl"
+	"github.com/pkg/errors"
 )
 
-func parseErr(err error) error {
-	re, ok := err.(rtl.ResponseError)
-	if !ok {
-		return err
-	}
+var (
+	// ErrNotFound occurs when a requested resource cannot be found.
+	ErrNotFound = errors.New("not found")
+)
 
-	if len(re.Body) == 0 {
-		return fmt.Errorf("response error. status=%d. error parsing body", re.StatusCode)
-	}
-
-	var e error
-	switch re.StatusCode {
-	case http.StatusUnprocessableEntity:
-		// Status 422 returns a json payload of type ValidationError
-		e = new(ValidationError)
-	default:
-		// All other status codes return a json payload of type Error
-		e = new(Error)
-	}
-	if err := json.Unmarshal(re.Body, &e); err != nil {
-		return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
-	}
-	re.Err = e
-
-	return re
-}
-
+// Error ensures that the Error type complies to the error interface.
 func (e Error) Error() string {
 	return e.Message
 }
 
+// Error ensures that the ValidationError type complies to the error interface.
 func (e ValidationError) Error() string {
 	if e.Errors == nil {
 		return e.Message
@@ -47,8 +28,42 @@ func (e ValidationError) Error() string {
 
 	var errSlice []string
 	for _, m := range *e.Errors {
-		// need to check field and message are not nil
-		errSlice = append(errSlice, fmt.Sprintf("an error has occured with field %s. %s\n", *m.Field, *m.Message))
+		errSlice = append(errSlice, fmt.Sprintf("'%s' (%s)", *m.Field, *m.Message))
 	}
-	return strings.Join(errSlice, ",")
+	return fmt.Sprintf("validation error on fields: %s", strings.Join(errSlice, ", "))
+}
+
+// deseraliseError decodeds the error message depending on the error response status.
+func deserialiseError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	re, ok := err.(rtl.ResponseError)
+	if !ok {
+		return err
+	}
+
+	switch re.StatusCode {
+	case http.StatusUnprocessableEntity:
+		e := new(ValidationError)
+		if err := json.Unmarshal(re.Body, &e); err != nil {
+			break
+		}
+		return e
+	case http.StatusNotFound:
+		e := new(Error)
+		if err := json.Unmarshal(re.Body, &e); err != nil {
+			break
+		}
+		return errors.Wrap(ErrNotFound, e.Message)
+	default:
+		e := new(Error)
+		if err := json.Unmarshal(re.Body, &e); err != nil {
+			break
+		}
+		return e
+	}
+
+	return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
 }

@@ -1,11 +1,16 @@
 package rtl
 
+import (
+	"fmt"
+)
+
+// ResponseError is a struct used to expose the StatusCode and Body of the error response.
 type ResponseError struct {
 	StatusCode int
 	Body       []byte
-	Err        error
 }
 
+// Error ensures that the ResponseError type complies to the error interface.
 func (e ResponseError) Error() string {
-	return e.Err.Error()
+	return fmt.Sprintf("response error. status=%d. error=%s", e.StatusCode, string(e.Body))
 }
