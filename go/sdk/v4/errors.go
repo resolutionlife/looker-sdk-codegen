@@ -45,19 +45,19 @@ func deserialiseError(err error) error {
 	switch re.StatusCode {
 	case http.StatusUnprocessableEntity:
 		e := new(ValidationError)
-		if err := json.Unmarshal(re.Body, e); err != nil {
+		if unmarshalErr := json.Unmarshal(re.Body, e); unmarshalErr != nil {
 			break
 		}
 		return e
 	case http.StatusNotFound:
 		e := new(Error)
-		if err := json.Unmarshal(re.Body, e); err != nil {
+		if unmarshalErr := json.Unmarshal(re.Body, e); unmarshalErr != nil {
 			break
 		}
 		return fmt.Errorf("%s: %w", e.Message, ErrNotFound)
 	default:
 		e := new(Error)
-		if err := json.Unmarshal(re.Body, e); err != nil {
+		if unmarshalErr := json.Unmarshal(re.Body, e); unmarshalErr != nil {
 			break
 		}
 		return e
