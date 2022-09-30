@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-
 	"fmt"
 	"io/ioutil"
 	"net/http"

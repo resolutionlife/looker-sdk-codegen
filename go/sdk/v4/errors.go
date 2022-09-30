@@ -35,7 +35,7 @@ func (e ValidationError) Error() string {
 	return fmt.Sprintf("validation error on fields: %s", strings.Join(errSlice, ", "))
 }
 
-// deseraliseError decodeds the error message depending on the error response status.
+// deseraliseError decodes the error message depending on the error response status.
 func deserialiseError(err error) error {
 	if err == nil {
 		return nil
@@ -49,23 +49,23 @@ func deserialiseError(err error) error {
 	switch re.StatusCode {
 	case http.StatusUnprocessableEntity:
 		e := new(ValidationError)
-		if err := json.Unmarshal(re.Body, &e); err != nil {
+		if err := json.Unmarshal(re.Body, e); err != nil {
 			break
 		}
 		return e
 	case http.StatusNotFound:
 		e := new(Error)
-		if err := json.Unmarshal(re.Body, &e); err != nil {
+		if err := json.Unmarshal(re.Body, e); err != nil {
 			break
 		}
 		return errors.Wrap(ErrNotFound, e.Message)
 	default:
 		e := new(Error)
-		if err := json.Unmarshal(re.Body, &e); err != nil {
+		if err := json.Unmarshal(re.Body, e); err != nil {
 			break
 		}
 		return e
 	}
 
-	return fmt.Errorf("error unmarshalling body with status: %d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
+	return fmt.Errorf("error unmarshalling body with status:%d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
 }
