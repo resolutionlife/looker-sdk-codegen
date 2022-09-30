@@ -2,12 +2,12 @@ package v4
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/looker-open-source/sdk-codegen/go/rtl"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -37,10 +37,6 @@ func (e ValidationError) Error() string {
 
 // deseraliseError decodes the error message depending on the error response status.
 func deserialiseError(err error) error {
-	if err == nil {
-		return nil
-	}
-
 	re, ok := err.(rtl.ResponseError)
 	if !ok {
 		return err
@@ -58,7 +54,7 @@ func deserialiseError(err error) error {
 		if err := json.Unmarshal(re.Body, e); err != nil {
 			break
 		}
-		return errors.Wrap(ErrNotFound, e.Message)
+		return fmt.Errorf("%s: %w", e.Message, ErrNotFound)
 	default:
 		e := new(Error)
 		if err := json.Unmarshal(re.Body, e); err != nil {
@@ -67,5 +63,5 @@ func deserialiseError(err error) error {
 		return e
 	}
 
-	return fmt.Errorf("error unmarshalling body with status:%d, body:%s, error:%s", re.StatusCode, re.Body, err.Error())
+	return fmt.Errorf("error unmarshalling body with status:%s, body:%s, error:%s", re.Status, re.Body, err.Error())
 }

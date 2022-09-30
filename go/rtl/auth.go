@@ -120,6 +120,7 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 		}
 
 		return ResponseError{
+			Status:     res.Status,
 			StatusCode: res.StatusCode,
 			Body:       b,
 		}
