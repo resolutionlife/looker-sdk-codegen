@@ -147,6 +147,13 @@ export const ResponseExplorer: FC<ResponseExplorerProps> = ({
     response.contentType === 'application/json'
       ? JSON.parse(response.body)
       : undefined
+
+  const timed = (response: IRawResponse) => {
+    if (!(response.responseCompleted || response.requestStarted)) return ''
+    const diff = (response.responseCompleted - response.requestStarted) / 1000
+    return `Seconds: ${diff.toFixed(3)}`
+  }
+
   return (
     <>
       {!response && <DarkSpan>No response was received</DarkSpan>}
@@ -171,7 +178,7 @@ export const ResponseExplorer: FC<ResponseExplorerProps> = ({
             )}
             {`${verb || ''} ${path || ''} (${response.statusCode}: ${
               response.statusMessage
-            })`}
+            }) ${timed(response)}`}
           </RunItHeading>
           <CollapserCard
             divider={false}

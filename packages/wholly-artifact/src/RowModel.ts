@@ -181,8 +181,12 @@ export interface IRowModel extends IRowModelProps {
   namespace(): string
 
   /**
-   * Prefix (table name, basically) to use for artifact key generation.
-   * Based on the object constructor. No need to override, usually.
+   * RowModel prefix to use for generating new key values. For example, a prefix() that returns `Hackathon` would
+   * result in a key assignment like `Hackathon:9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d`
+   *
+   * When using artifact collections like data tables, artifact key values are intended to be hidden from the UI.
+   * This prefix is purely used for making it feasible to query an artifact collection by its prefix key value
+   * Must be implemented.
    */
   tableName(): string
 
@@ -278,6 +282,9 @@ export abstract class RowModel<T extends IRowModel> implements IRowModel {
       }
       Object.keys(value).forEach((k) => {
         this[k] = this.typeCast(k, value[k])
+        if (typeof this[k] === 'string') {
+          this[k] = decodeURI(this[k])
+        }
       })
       if (values.key) this.key = values.key
       return true
@@ -459,6 +466,8 @@ export abstract class RowModel<T extends IRowModel> implements IRowModel {
 
   /**
    * Values to store in attribute
+   *
+   * All string values are stored with encodeURI to prevent character encoding issues
    * @private
    */
   private storageValues() {
@@ -467,7 +476,9 @@ export abstract class RowModel<T extends IRowModel> implements IRowModel {
     // const keys = this.displayHeader()
     const keys = this.header()
     for (const key of keys) {
-      result[key] = this[key]
+      const val =
+        typeof this[key] === 'string' ? encodeURI(this[key]) : this[key]
+      result[key] = val
     }
     return result
   }
