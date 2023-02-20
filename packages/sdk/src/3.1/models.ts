@@ -1246,6 +1246,10 @@ export interface IDashboard {
    */
   edit_uri?: Url | null
   /**
+   * Allow visualizations to be viewed in full screen mode
+   */
+  enable_viz_full_screen?: boolean
+  /**
    * Number of times favorited (read-only)
    */
   favorite_count?: number | null
@@ -3034,6 +3038,10 @@ export interface IIntegration {
    * A list of descriptions of required fields that this integration is compatible with. If there are multiple entries in this list, the integration requires more than one field. If unspecified, no fields will be required. (read-only)
    */
   required_fields?: IIntegrationRequiredField[]
+  /**
+   * Link to privacy policy for destination (read-only)
+   */
+  privacy_link?: string | null
   /**
    * Whether the integration uses delegate oauth, which allows federation between an integration installation scope specific entity (like org, group, and team, etc.) and Looker. (read-only)
    */
@@ -8688,6 +8696,14 @@ export interface IThemeSettings {
    * Toggles the tile shadow (not supported)
    */
   tile_shadow?: boolean
+  /**
+   * Toggle to show the dashboard last updated indicator. Defaults to true.
+   */
+  show_last_updated_indicator?: boolean
+  /**
+   * Toggle to show reload data icon/button. Defaults to true.
+   */
+  show_reload_data_icon?: boolean
 }
 
 export interface ITimezone {
@@ -9509,6 +9525,10 @@ export interface IWriteDashboard {
    */
   deleted?: boolean
   /**
+   * Allow visualizations to be viewed in full screen mode
+   */
+  enable_viz_full_screen?: boolean
+  /**
    * Sets the default state of the filters bar to collapsed or open
    */
   filters_bar_collapsed?: boolean
@@ -10109,7 +10129,7 @@ export interface IWriteHomepageSection {
 
 /**
  * Dynamic writeable type for Integration removes:
- * can, id, integration_hub_id, label, description, supported_formats, supported_action_types, supported_formattings, supported_visualization_formattings, supported_download_settings, icon_url, uses_oauth, required_fields, delegate_oauth
+ * can, id, integration_hub_id, label, description, supported_formats, supported_action_types, supported_formattings, supported_visualization_formattings, supported_download_settings, icon_url, uses_oauth, required_fields, privacy_link, delegate_oauth
  */
 export interface IWriteIntegration {
   /**

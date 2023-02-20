@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.12.0](https://www.github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v2.11.0...sdk-codegen-all-v2.12.0) (2022-11-10)
+
+
+### Features
+
+* generate SDKs for Looker 22.20 ([#1203](https://www.github.com/looker-open-source/sdk-codegen/issues/1203)) ([ba4595e](https://www.github.com/looker-open-source/sdk-codegen/commit/ba4595ee47895ec11ed1e1a74d87748285210d64))
+
+
+### Bug Fixes
+
+* Handle Go SDK 204 no responses correctly ([#1193](https://www.github.com/looker-open-source/sdk-codegen/issues/1193)) ([ba7ded8](https://www.github.com/looker-open-source/sdk-codegen/commit/ba7ded84a9a09da2ef63362792656cbd57d9aae1))
+* oauth support in APIX when embedded in another app ([#1198](https://www.github.com/looker-open-source/sdk-codegen/issues/1198)) ([c464d2f](https://www.github.com/looker-open-source/sdk-codegen/commit/c464d2f24c7f8e7d282208efd00feaaba216fe3e))
+* spec parsing unit tests ([#1207](https://www.github.com/looker-open-source/sdk-codegen/issues/1207)) ([4e86291](https://www.github.com/looker-open-source/sdk-codegen/commit/4e862913b555c6294798d11eaa012b7f72736ecb))
+
+## [2.11.0](https://www.github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v2.10.0...sdk-codegen-all-v2.11.0) (2022-10-17)
+
+
+### Features
+
+* generate SDKs for Looker 22.18 ([#1191](https://www.github.com/looker-open-source/sdk-codegen/issues/1191)) ([6d487be](https://www.github.com/looker-open-source/sdk-codegen/commit/6d487be80e89bda6feea446130ad2c318eb61d43))
+
+
+### Bug Fixes
+
+* various path navigation issues ([#1190](https://www.github.com/looker-open-source/sdk-codegen/issues/1190)) ([e73da3d](https://www.github.com/looker-open-source/sdk-codegen/commit/e73da3d39960cb528947c21202318b84d586ce1f))
+
 ## [2.10.0](https://www.github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v2.9.0...sdk-codegen-all-v2.10.0) (2022-09-21)
 
 
